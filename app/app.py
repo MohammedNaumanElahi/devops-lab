@@ -1,13 +1,20 @@
 from flask import Flask, jsonify
-import os
+import redis, os
 
 app = Flask(__name__)
 
+r = redis.Redis(
+    host=os.getenv("REDIS_HOST", "localhost"),
+    port=6379,
+    decode_responses=True
+)
+
 @app.route("/")
 def index():
+    count = r.incr("visits")
     return jsonify({
-        "message": "Hello from DevOps Lab",
-        "hostname": os.uname().nodename
+        "message": "Hello from DevOps Lab!",
+        "visits": count
     })
 
 @app.route("/health")
